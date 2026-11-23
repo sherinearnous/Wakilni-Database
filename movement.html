@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "components.html" import badge %}
+{% block title %}Movement {{ movement.movementNo }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('movements') }}">‹ All inventory movements</a>
+<header class="page-head"><div><p class="eyebrow">INVENTORY MOVEMENT</p><h1>Movement #{{ movement.movementNo }}</h1>
+  <p class="subtitle">{{ movement.inventorymovementType }} · {{ movement.dateAndTime }} Beirut time</p></div>{{ badge(movement.inventorymovementStatus) }}</header>
+<div class="details-grid">
+  <section class="panel detail"><h2><span class="icon icon-movements" aria-hidden="true"></span> Movement record</h2><dl>
+    <dt>Movement number</dt><dd>{{ movement.movementNo }}</dd>
+    <dt>Type</dt><dd>{{ movement.inventorymovementType }}</dd>
+    <dt>Status</dt><dd>{{ movement.inventorymovementStatus }}</dd>
+    <dt>Date and time</dt><dd>{{ movement.dateAndTime }}</dd>
+    <dt>Equipment</dt><dd>{{ movement.inventorymovementEquipment or '—' }}</dd>
+  </dl></section>
+  <section class="panel detail storage"><h2><span class="icon icon-warehouse" aria-hidden="true"></span> Inventory location</h2><dl>
+    <dt>Warehouse</dt><dd><a class="text-link" href="{{ url_for('warehouse_detail', warehouse_id=movement.warehouseID) }}">{{ movement.warehouseName }}</a></dd>
+    <dt>Location ID</dt><dd>{{ movement.inventorylocationID }}</dd>
+    <dt>Zone</dt><dd>{{ movement.inventorylocationZone }}</dd>
+    <dt>Aisle, rack, shelf</dt><dd>{{ movement.inventorylocationAisle }}, {{ movement.inventorylocationRack }}, {{ movement.inventorylocationShelf }}</dd>
+  </dl></section>
+</div>
+<section class="panel"><div class="panel-head"><h2>Products in this movement</h2></div>
+  {% if items %}<div class="table-wrap"><table><thead><tr><th>Product</th><th>Merchant SKU</th><th>Quantity moved</th></tr></thead><tbody>
+  {% for row in items %}<tr><td><a class="record wrap" href="{{ url_for('product_detail', product_id=row.productID) }}">{{ row.productName }}</a><small class="cell-secondary">{{ row.productID }}</small></td>
+    <td>{{ row.merchantSKU }}</td><td>{{ row.quantityPerProductType|number }}</td></tr>{% endfor %}
+  </tbody></table></div>{% else %}<p class="empty">No products are recorded for this movement.</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, filters, pagination %}
+{% block title %}Warehouses{% endblock %}
+{% block content %}
+<header class="page-head"><div><p class="eyebrow">INVENTORY</p><h1>Warehouses</h1><p class="subtitle">Browse warehouse addresses, capacity status, and storage zones.</p></div></header>
+<section class="panel">
+  {{ filters('warehouses', 'Warehouse name, ID, or city', q, filter_controls, clear_args, has_filters) }}
+  {% if rows %}<div class="table-wrap"><table>
+    <thead><tr><th>Warehouse</th><th>City</th><th>Type</th><th>Operational status</th><th>Capacity status</th><th>Lot size</th></tr></thead>
+    <tbody>{% for row in rows %}<tr>
+      <td><a class="record wrap" href="{{ url_for('warehouse_detail', warehouse_id=row.warehouseID) }}">{{ row.warehouseName }}</a><small class="cell-secondary">{{ row.warehouseID }}</small></td>
+      <td>{{ row.addressCity or '—' }}</td><td>{{ row.warehouseType }}</td><td>{{ badge(row.operationalStatus) }}</td>
+      <td>{{ badge(row.capacityStatus) }}</td><td>{{ row.lotSize|number }} m²</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p class="empty">No warehouses match your search.</p>{% endif %}
+  {{ pagination('warehouses', page, pages, total, 'warehouse', page_args) }}
+</section>
+{% endblock %}

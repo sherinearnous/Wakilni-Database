@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "components.html" import badge %}
+{% block title %}Vehicle {{ vehicle.vehicleRegistrationNo }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('vehicles') }}">‹ All vehicles</a>
+<header class="page-head"><div><p class="eyebrow">VEHICLE · {{ vehicle.vehicleID }}</p><h1>{{ vehicle.vehicleRegistrationNo }}</h1>
+  <p class="subtitle">{{ vehicle.vehicleType }} · License category {{ license }}</p></div>{{ badge(vehicle.vehicleOperationalStatus) }}</header>
+<section class="panel detail storage">
+  <h2><span class="icon icon-vehicles" aria-hidden="true"></span> Capacity and usage</h2>
+  <dl class="location-grid">
+    <div><dt>Max volume</dt><dd>{{ vehicle.maxVehicleCapacity|number }} m³</dd></div>
+    <div><dt>Max load</dt><dd>{{ vehicle.maxVehicleWeight|number }} kg</dd></div>
+    <div><dt>Fuel tank limit</dt><dd>{{ vehicle.maxFuelLimit|number }} L</dd></div>
+    <div><dt>Delivery count</dt><dd>{{ vehicle.deliveryCount|number if vehicle.deliveryCount is not none else '—' }}</dd></div>
+  </dl>
+</section>
+<div class="details-grid section-gap">
+  <section class="panel detail"><h2>Vehicle record</h2><dl>
+    <dt>Vehicle ID</dt><dd>{{ vehicle.vehicleID }}</dd>
+    <dt>Registration number</dt><dd>{{ vehicle.vehicleRegistrationNo }}</dd>
+    <dt>Vehicle type</dt><dd>{{ vehicle.vehicleType }}</dd>
+    <dt>Operational status</dt><dd>{{ vehicle.vehicleOperationalStatus }}</dd>
+  </dl></section>
+  <section class="panel detail"><h2>Assignments</h2><dl>
+    <dt>Assigned driver</dt><dd>{% if vehicle.driverID %}<a class="text-link" href="{{ url_for('driver_detail', driver_id=vehicle.driverID) }}">{{ vehicle.driverName }}</a>{% else %}Unassigned{% endif %}</dd>
+    <dt>Shipment</dt><dd>{% if shipment %}<a class="text-link" href="{{ url_for('shipment_detail', shipment_id=shipment.shipmentID) }}">{{ shipment.shipmentID }}</a> · {{ shipment.shipmentStatus }}{% else %}Unassigned{% endif %}</dd>
+    {% if shipment %}<dt>Planned dispatch</dt><dd>{{ shipment.plannedDispatchDateAndTime }}</dd>{% endif %}
+  </dl></section>
+</div>
+{% endblock %}

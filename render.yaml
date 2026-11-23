@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: wakilni-class-demo
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-render.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 app:app
+    healthCheckPath: /health
+    envVars:
+      - key: WAKILNI_DEMO_PASSWORD
+        sync: false
+      - key: WAKILNI_SECRET_KEY
+        generateValue: true

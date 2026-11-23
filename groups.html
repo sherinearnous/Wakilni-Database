@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, filters, pagination %}
+{% block title %}Business groups{% endblock %}
+{% block content %}
+<header class="page-head"><div><p class="eyebrow">DIRECTORY</p><h1>Business groups</h1><p class="subtitle">Browse payout schedules, operating status, and group details.</p></div></header>
+<section class="panel">
+  {{ filters('business_groups', 'Name, business group ID, or website', q, filter_controls, clear_args, has_filters) }}
+  {% if rows %}<div class="table-wrap"><table>
+    <thead><tr><th>Business group</th><th>Website</th><th>Group type</th><th>Payout frequency</th><th>Wakilni status</th></tr></thead>
+    <tbody>{% for row in rows %}
+      <tr><td><a class="record wrap" href="{{ url_for('business_group_detail', group_id=row.businessgroupID) }}">{{ row.businessgroupName }}</a><small class="cell-secondary">{{ row.businessgroupID }}</small></td>
+      <td>{{ row.businessgroupWebsite or '—' }}</td><td>{{ row.types or '—' }}</td><td>{{ row.payoutFrequency }}</td><td>{{ badge(row.operationalStatusWithWakilni) }}</td></tr>
+    {% endfor %}</tbody>
+  </table></div>{% else %}<p class="empty">No business groups match your search.</p>{% endif %}
+  {{ pagination('business_groups', page, pages, total, 'business group', page_args) }}
+</section>
+{% endblock %}

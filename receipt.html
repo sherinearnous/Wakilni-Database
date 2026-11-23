@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Receipt {{ receipt.invoiceID }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('receipts') }}">‹ All delivery receipts</a>
+<header class="page-head"><div><p class="eyebrow">DELIVERY RECEIPT</p><h1>{{ receipt.invoiceID }}</h1>
+  <p class="subtitle">{{ receipt.receiptDateAndTime }} · Beirut time</p></div></header>
+<div class="details-grid receipt-grid">
+  <section class="panel detail"><h2><span class="icon icon-receipts" aria-hidden="true"></span> Receipt record</h2><dl>
+    <dt>Invoice ID</dt><dd>{{ receipt.invoiceID }}</dd>
+    <dt>Receipt date and time</dt><dd>{{ receipt.receiptDateAndTime }}</dd>
+    <dt>Business group</dt><dd><a class="text-link" href="{{ url_for('business_group_detail', group_id=receipt.businessgroupID) }}">{{ receipt.businessgroupName }}</a> · {{ receipt.businessgroupID }}</dd>
+    <dt>Order</dt><dd><a class="text-link" href="{{ url_for('order_detail', order_id=receipt.orderID) }}">{{ receipt.orderTrackingNumber }}</a> · {{ receipt.orderID }} · {{ receipt.orderType }}</dd>
+    <dt>Shipment</dt><dd><a class="text-link" href="{{ url_for('shipment_detail', shipment_id=receipt.shipmentID) }}">{{ receipt.shipmentID }}</a> · {{ receipt.shipmentStatus }}</dd>
+    <dt>Order payment method</dt><dd>{{ receipt.orderPaymentMethod }}</dd>
+  </dl></section>
+  <section class="panel detail receipt-fees"><h2>Delivery charges</h2><dl>
+    <dt>Delivery fee</dt><dd>{{ receipt.deliveryFee|money }}</dd>
+    <dt>Receipt tax</dt><dd>{{ receipt.receiptTaxFee|money }}</dd>
+    <dt class="receipt-total">Delivery total</dt><dd class="receipt-total">{{ (receipt.deliveryFee + receipt.receiptTaxFee)|money }}</dd>
+  </dl></section>
+</div>
+{% endblock %}

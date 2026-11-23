@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "components.html" import badge %}
+{% block title %}{{ order.orderTrackingNumber }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('orders') }}">‹ All orders</a>
+<header class="page-head">
+  <div><p class="eyebrow">{{ order.orderID }}</p><h1>{{ order.orderTrackingNumber }}</h1><p class="subtitle"><a class="text-link" href="{{ url_for('business_group_detail', group_id=order.businessgroupID) }}">{{ order.businessgroupName }}</a> · {{ order.orderType }}</p></div>
+  {{ badge(order.status) }}
+</header>
+<div class="details-grid">
+  <section class="panel detail"><h2>Delivery details</h2>
+    <dl><dt>Receiving location</dt><dd>{{ order.businesslocationID }}{% if order.addressCity %} · {{ order.addressCity }}{% endif %}</dd>
+        <dt>Address</dt><dd>{{ [order.addressBuilding, order.addressStreet, order.addressCity]|select|join(', ') or '—' }}</dd>
+        <dt>Created</dt><dd>{{ order.orderDateAndTime }}</dd>
+        <dt>Requested delivery</dt><dd>{{ order.requestedDeliveryDateAndTime or '—' }}</dd>
+        <dt>Payment method</dt><dd>{{ order.orderPaymentMethod }}</dd>
+        {% if order.orderDescription %}<dt>Notes</dt><dd>{{ order.orderDescription }}</dd>{% endif %}
+    </dl>
+  </section>
+  <section class="panel detail"><h2>Charges</h2>
+    <dl><dt>Product subtotal</dt><dd>{{ subtotal|money }}</dd><dt>Delivery fee</dt><dd>{{ order.deliveryFee|money }}</dd>
+        {% if receipt %}<dt>Delivery tax</dt><dd>{{ receipt.receiptTaxFee|money }}</dd><dt>Receipt</dt><dd><a class="text-link" href="{{ url_for('receipt_detail', invoice_id=receipt.invoiceID) }}">{{ receipt.invoiceID }}</a> · {{ receipt.receiptDateAndTime }}</dd>{% endif %}
+    </dl>
+  </section>
+</div>
+<section class="panel">
+  <div class="panel-head"><h2>Order items</h2></div>
+  <div class="table-wrap"><table><thead><tr><th>Product</th><th>SKU</th><th>Quantity</th><th>Unit price</th><th>Line total</th></tr></thead><tbody>
+  {% for item in items %}<tr><td><a class="record wrap" href="{{ url_for('product_detail', product_id=item.productID) }}">{{ item.productName }}</a></td><td>{{ item.merchantSKU }}</td><td>{{ item.productQuantity }}</td>
+    <td>{{ item.unitPriceAtOrder|money }}</td><td>{{ (item.productQuantity * item.unitPriceAtOrder)|money }}</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<section class="panel">
+  <div class="panel-head split"><h2>Shipment allocations</h2>
+    {% if can_assign %}<a class="button primary small" href="{{ url_for('order_assign', order_id=order.orderID) }}"><span class="icon icon-shipments" aria-hidden="true"></span> Assign shipment</a>{% endif %}
+  </div>
+  {% if allocations %}
+  <div class="table-wrap"><table><thead><tr><th>Shipment</th><th>Allocated units</th><th>Status</th></tr></thead><tbody>
+  {% for row in allocations %}<tr><td><a class="record" href="{{ url_for('shipment_detail', shipment_id=row.shipmentID) }}">{{ row.shipmentID }}</a></td>
+    <td>{{ row.quantityAllocatedPerProduct }}</td><td>{{ badge(row.shipmentStatus) }}</td></tr>{% endfor %}
+  </tbody></table></div>
+  {% else %}<p class="empty">No shipments are allocated to this order.</p>{% endif %}
+</section>
+{% endblock %}

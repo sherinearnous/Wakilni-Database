@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, filters, pagination %}
+{% block title %}Inventory movements{% endblock %}
+{% block content %}
+<header class="page-head"><div><p class="eyebrow">INVENTORY</p><h1>Inventory movements</h1>
+  <p class="subtitle">See inbound stock, outbound picks, transfers, and adjustments recorded in SQLite.</p></div></header>
+<section class="panel">
+  {% if product %}
+  <div class="scope-bar"><span>Showing movements for</span>
+    <a class="text-link" href="{{ url_for('product_detail', product_id=product.productID) }}">{{ product.productName }}</a>
+    <a class="text-link" href="{{ url_for('movements') }}">View all movements</a>
+  </div>
+  {% endif %}
+  {{ filters('movements', 'Movement number, product, or location', q, filter_controls, clear_args, has_filters) }}
+  {% if rows %}<div class="table-wrap"><table>
+    <thead><tr><th>Movement no.</th><th>Date and time</th><th>Type</th><th>Status</th><th>Warehouse and location</th><th>Equipment</th></tr></thead>
+    <tbody>{% for row in rows %}<tr>
+      <td><a class="record" href="{{ url_for('movement_detail', movement_no=row.movementNo) }}">#{{ row.movementNo }}</a></td>
+      <td class="date">{{ row.dateAndTime }}</td><td>{{ row.inventorymovementType }}</td><td>{{ badge(row.inventorymovementStatus) }}</td>
+      <td><a class="text-link" href="{{ url_for('warehouse_detail', warehouse_id=row.warehouseID) }}">{{ row.warehouseName }}</a><small class="cell-secondary">{{ row.inventorylocationID }} · {{ row.inventorylocationZone }}</small></td>
+      <td>{{ row.inventorymovementEquipment or '—' }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p class="empty">No inventory movements match these filters.</p>{% endif %}
+  {{ pagination('movements', page, pages, total, 'movement', page_args) }}
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "components.html" import filters, order_table, pagination %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><p class="eyebrow">ORDER MANAGEMENT</p><h1>Orders</h1><p class="subtitle">Find a delivery, inspect its items, or add a new order.</p></div>
+  <a class="button primary" href="{{ url_for('order_new') }}"><span class="icon icon-plus" aria-hidden="true"></span> New order</a>
+</header>
+<section class="panel">
+  {{ filters('orders', 'Tracking number, business group, or city', q, filter_controls, clear_args, has_filters) }}
+  {% if rows %}{{ order_table(rows, true) }}{% else %}<p class="empty">No orders match your search.</p>{% endif %}
+  {{ pagination('orders', page, pages, total, 'order', page_args) }}
+</section>
+{% endblock %}

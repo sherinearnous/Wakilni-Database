@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ product.productName }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('products') }}">‹ All products</a>
+<header class="page-head"><div><p class="eyebrow">PRODUCT · {{ product.productID }}</p><h1>{{ product.productName }}</h1>
+  <p class="subtitle"><a class="text-link" href="{{ url_for('business_group_detail', group_id=product.businessgroupID) }}">{{ product.businessgroupName }}</a> · {{ product.merchantSKU }}</p></div>
+  <a class="button secondary" href="{{ url_for('movements', product=product.productID) }}"><span class="icon icon-movements" aria-hidden="true"></span> Inventory movements</a></header>
+<section class="panel detail storage">
+  <h2><span class="icon icon-warehouse" aria-hidden="true"></span> Warehouse location</h2>
+  {% if product.inventorylocationID %}
+    <p class="form-note"><a class="text-link" href="{{ url_for('warehouse_detail', warehouse_id=product.warehouseID) }}">{{ product.warehouseName }}</a> · {{ product.warehouseID }}{% if product.addressCity %} · {{ product.addressCity }}{% endif %}</p>
+    <dl class="location-grid">
+      <div><dt>Zone</dt><dd>{{ product.inventorylocationZone }}</dd></div>
+      <div><dt>Aisle</dt><dd>{{ product.inventorylocationAisle }}</dd></div>
+      <div><dt>Rack</dt><dd>{{ product.inventorylocationRack }}</dd></div>
+      <div><dt>Shelf</dt><dd>{{ product.inventorylocationShelf }}</dd></div>
+    </dl>
+    <dl class="inline-details">
+      <div><dt>Inventory location ID</dt><dd>{{ product.inventorylocationID }}</dd></div>
+      <div><dt>Location max weight</dt><dd>{{ product.binWeight }} kg</dd></div>
+      <div><dt>Location max volume</dt><dd>{{ product.binVolume }} m³</dd></div>
+    </dl>
+  {% else %}<p class="form-note">This product has no assigned inventory location.</p>{% endif %}
+</section>
+<div class="details-grid section-gap">
+  <section class="panel detail">
+    <h2><span class="icon icon-products" aria-hidden="true"></span> Product specifications</h2>
+    <dl>
+      <dt>Product ID</dt><dd>{{ product.productID }}</dd>
+      <dt>Product name</dt><dd>{{ product.productName }}</dd>
+      <dt>Description</dt><dd>{{ product.productDescription or '—' }}</dd>
+      <dt>Merchant SKU</dt><dd>{{ product.merchantSKU }}</dd>
+      <dt>Business group ID</dt><dd><a class="text-link" href="{{ url_for('business_group_detail', group_id=product.businessgroupID) }}">{{ product.businessgroupID }}</a></dd>
+      <dt>Unit price</dt><dd>{{ product.productUnitPrice|money }}</dd>
+      <dt>Unit weight</dt><dd>{{ product.unitWeight }} kg</dd>
+      <dt>Unit volume</dt><dd>{% if product.unitVolume is not none %}{{ product.unitVolume }} m³{% else %}—{% endif %}</dd>
+    </dl>
+  </section>
+  <section class="panel detail">
+    <h2>Packaging</h2>
+    {% if product.packagingID %}
+    <dl>
+      <dt>Packaging ID</dt><dd>{{ product.packagingID }}</dd>
+      <dt>Type</dt><dd>{{ product.packagingType }}</dd>
+      <dt>Configuration</dt><dd>{{ product.packagingConfiguration or '—' }}</dd>
+      <dt>Units per package</dt><dd>{{ product.unitsPerPackage or '—' }}</dd>
+      <dt>Length × width × height</dt><dd>{{ product.length }} × {{ product.width }} × {{ product.height }} cm</dd>
+      <dt>Maximum load</dt><dd>{{ product.packagingMaxWeight }} kg</dd>
+      <dt>Packaging weight</dt><dd>{{ product.packagingWeight }} kg</dd>
+    </dl>
+    {% else %}<p class="form-note">This product has no assigned packaging.</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

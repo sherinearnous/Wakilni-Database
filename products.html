@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from "components.html" import filters, pagination, product_table %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<header class="page-head"><div><p class="eyebrow">INVENTORY</p><h1>Products</h1><p class="subtitle">Find a product and see its warehouse, storage location, and specifications.</p></div></header>
+<section class="panel">
+  {{ filters('products', 'Product name, SKU, business group, or warehouse', q, filter_controls, clear_args, has_filters) }}
+  {% if rows %}{{ product_table(rows) }}{% else %}<p class="empty">No products match your search.</p>{% endif %}
+  {{ pagination('products', page, pages, total, 'product', page_args) }}
+</section>
+{% endblock %}
