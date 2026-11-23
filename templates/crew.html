@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "components.html" import fleet_fields %}
+{% block title %}Change driver or vehicle{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('shipment_detail', shipment_id=shipment.shipmentID) }}">‹ {{ shipment.shipmentID }}</a>
+<header class="page-head"><div><p class="eyebrow">DISPATCH PLANNING</p><h1>Change driver or vehicle</h1>
+  <p class="subtitle">{{ shipment.shipmentID }} · Planned dispatch {{ shipment.plannedDispatchDateAndTime }}</p></div></header>
+{% if error %}<div class="flash error" role="alert">{{ error }}</div>{% endif %}
+<section class="panel detail assign-card">
+  <h2><span class="icon icon-drivers" aria-hidden="true"></span> Driver and vehicle assignment</h2>
+  <p class="form-note">Currently assigned to <a class="text-link" href="{{ url_for('driver_detail', driver_id=shipment.driverID) }}">{{ shipment.driverName }}</a> · {{ shipment.vehicleType }} · {{ shipment.vehicleRegistrationNo }}.</p>
+  {% if fleet %}
+  <p class="form-note">Vehicles appear when they fit the shipment load, match the driver’s license, and are available for assignment. Saving also updates the selected driver’s vehicle assignment.</p>
+  <form method="post">
+    <input type="hidden" name="token" value="{{ token }}">
+    <div class="form-grid">{{ fleet_fields(fleet, form.get('driver', shipment.driverID), form.get('vehicle', shipment.vehicleID)) }}</div>
+    <p id="fleet-note" class="form-note" aria-live="polite"></p>
+    <div class="form-actions compact"><a class="button secondary" href="{{ url_for('shipment_detail', shipment_id=shipment.shipmentID) }}">Cancel</a><button class="button primary" type="submit">Save assignment</button></div>
+  </form>
+  {% else %}<p class="form-note">There are no available driver and vehicle pairs for this load.</p>{% endif %}
+</section>
+{% endblock %}
+{% block script %}
+{% if fleet %}
+<script type="application/json" id="fleet-options">{{ fleet|tojson }}</script>
+<script src="{{ url_for('static', filename='fleet-form.js') }}" defer></script>
+{% endif %}
+{% endblock %}

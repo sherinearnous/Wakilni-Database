@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Overview{% endblock %} · Wakilni</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('home') }}"><span class="brand-mark" aria-hidden="true">W</span><span>Wakilni<small>B2B Logistics</small></span></a>
+    <nav aria-label="Main navigation">
+      <span class="nav-label">WORKSPACE</span>
+      {% set active = request.endpoint %}
+      <a href="{{ url_for('home') }}" {% if active == 'home' %}aria-current="page"{% endif %}><span class="icon icon-overview" aria-hidden="true"></span> Overview</a>
+      <a href="{{ url_for('orders') }}" {% if active in ['orders', 'order_detail', 'order_assign'] %}aria-current="page"{% endif %}><span class="icon icon-orders" aria-hidden="true"></span> Orders</a>
+      <a href="{{ url_for('shipments') }}" {% if active in ['shipments', 'shipment_detail', 'shipment_crew'] %}aria-current="page"{% endif %}><span class="icon icon-shipments" aria-hidden="true"></span> Shipments</a>
+      <a href="{{ url_for('drivers') }}" {% if active in ['drivers', 'driver_detail'] %}aria-current="page"{% endif %}><span class="icon icon-drivers" aria-hidden="true"></span> Drivers</a>
+      <a href="{{ url_for('vehicles') }}" {% if active in ['vehicles', 'vehicle_detail'] %}aria-current="page"{% endif %}><span class="icon icon-vehicles" aria-hidden="true"></span> Vehicles</a>
+      <a href="{{ url_for('receipts') }}" {% if active in ['receipts', 'receipt_detail'] %}aria-current="page"{% endif %}><span class="icon icon-receipts" aria-hidden="true"></span> Delivery receipts</a>
+      <span class="nav-label nav-divider">INVENTORY &amp; DIRECTORY</span>
+      <a href="{{ url_for('business_groups') }}" {% if active in ['business_groups', 'business_group_detail'] %}aria-current="page"{% endif %}><span class="icon icon-groups" aria-hidden="true"></span> Business groups</a>
+      <a href="{{ url_for('products') }}" {% if active in ['products', 'product_detail'] %}aria-current="page"{% endif %}><span class="icon icon-products" aria-hidden="true"></span> Products</a>
+      <a href="{{ url_for('warehouses') }}" {% if active in ['warehouses', 'warehouse_detail'] %}aria-current="page"{% endif %}><span class="icon icon-warehouse" aria-hidden="true"></span> Warehouses</a>
+      <a href="{{ url_for('movements') }}" {% if active in ['movements', 'movement_detail'] %}aria-current="page"{% endif %}><span class="icon icon-movements" aria-hidden="true"></span> Inventory movements</a>
+      <a class="nav-new" href="{{ url_for('order_new') }}" {% if active == 'order_new' %}aria-current="page"{% endif %}><span class="icon icon-plus" aria-hidden="true"></span> New order</a>
+    </nav>
+    <div class="sidebar-footer"><span></span><div>{{ 'Online class demo' if config.RENDER_HOSTED else 'Local demo' }}<small>{{ 'Changes reset on restart' if config.RENDER_HOSTED else 'SQLite database' }}</small></div></div>
+  </aside>
+  <main id="content">
+    {% for category, message in get_flashed_messages(with_categories=true) %}<div class="flash {{ 'error' if category == 'error' else '' }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  {% block script %}{% endblock %}
+</body>
+</html>

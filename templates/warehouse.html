@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "components.html" import badge %}
+{% block title %}{{ warehouse.warehouseName }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('warehouses') }}">‹ All warehouses</a>
+<header class="page-head"><div><p class="eyebrow">WAREHOUSE · {{ warehouse.warehouseID }}</p><h1>{{ warehouse.warehouseName }}</h1>
+  <p class="subtitle">{{ warehouse.warehouseType }}{% if warehouse.addressCity %} · {{ warehouse.addressCity }}{% endif %}</p></div>
+  <div class="header-actions"><a class="button secondary" href="{{ url_for('products', warehouse=warehouse.warehouseID) }}">View stored products</a>
+  <a class="button secondary" href="{{ url_for('movements', warehouse=warehouse.warehouseID) }}"><span class="icon icon-movements" aria-hidden="true"></span> Inventory movements</a></div></header>
+<div class="details-grid">
+  <section class="panel detail storage">
+    <h2><span class="icon icon-warehouse" aria-hidden="true"></span> Warehouse profile</h2>
+    <dl>
+      <dt>Warehouse ID</dt><dd>{{ warehouse.warehouseID }}</dd>
+      <dt>Warehouse name</dt><dd>{{ warehouse.warehouseName }}</dd>
+      <dt>Warehouse type</dt><dd>{{ warehouse.warehouseType }}</dd>
+      <dt>Operational status</dt><dd>{{ badge(warehouse.operationalStatus) }}</dd>
+      <dt>Capacity status</dt><dd>{{ badge(warehouse.capacityStatus) }}</dd>
+      <dt>Lot size</dt><dd>{{ warehouse.lotSize|number }} m²</dd>
+    </dl>
+  </section>
+  <section class="panel detail"><h2>Address</h2>
+    <dl>
+      <dt>Building</dt><dd>{{ warehouse.addressBuilding or '—' }}</dd>
+      <dt>Street</dt><dd>{{ warehouse.addressStreet }}</dd>
+      <dt>Postal code</dt><dd>{{ warehouse.addressPostalCode or '—' }}</dd>
+      <dt>City</dt><dd>{{ warehouse.addressCity or '—' }}</dd>
+      <dt>District</dt><dd>{{ warehouse.addressDistrict or '—' }}</dd>
+      <dt>Country</dt><dd>{{ warehouse.addressCountry or '—' }}</dd>
+      <dt>Latitude</dt><dd>{{ warehouse.addressLatitude if warehouse.addressLatitude is not none else '—' }}</dd>
+      <dt>Longitude</dt><dd>{{ warehouse.addressLongitude if warehouse.addressLongitude is not none else '—' }}</dd>
+    </dl>
+  </section>
+</div>
+<section class="panel"><div class="panel-head"><h2>Aisles and zones</h2></div>
+  {% if aisles %}<div class="table-wrap"><table><thead><tr><th>Aisle</th><th>Zone</th><th>Inventory locations</th></tr></thead>
+    <tbody>{% for row in aisles %}<tr><td>{{ row.inventorylocationAisle }}</td><td>{{ row.inventorylocationZone }}</td><td>{{ row.locations }}</td></tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p class="empty">No aisles are recorded for this warehouse.</p>{% endif %}
+</section>
+<section class="panel"><div class="panel-head"><h2>Renting business groups</h2></div>
+  {% if rentals %}<div class="table-wrap"><table><thead><tr><th>Business group</th><th>Space rented</th></tr></thead>
+    <tbody>{% for row in rentals %}<tr><td><a class="record wrap" href="{{ url_for('business_group_detail', group_id=row.businessgroupID) }}">{{ row.businessgroupName }}</a></td><td>{{ row.spaceRented|number }} m²</td></tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p class="empty">No rented space is recorded for this warehouse.</p>{% endif %}
+</section>
+{% endblock %}

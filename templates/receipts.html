@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "components.html" import filters, pagination %}
+{% block title %}Delivery receipts{% endblock %}
+{% block content %}
+<header class="page-head"><div><p class="eyebrow">DELIVERIES</p><h1>Delivery receipts</h1>
+  <p class="subtitle">Find a receipt by invoice ID, order tracking number, shipment, or business group.</p></div></header>
+<section class="panel">
+  {{ filters('receipts', 'Invoice ID, tracking number, shipment, or business group', q, filter_controls, clear_args, has_filters) }}
+  {% if rows %}<div class="table-wrap"><table>
+    <thead><tr><th>Invoice ID</th><th>Receipt date and time</th><th>Order tracking</th><th>Business group</th><th>Shipment</th><th>Receipt tax</th></tr></thead>
+    <tbody>{% for row in rows %}<tr>
+      <td><a class="record" href="{{ url_for('receipt_detail', invoice_id=row.invoiceID) }}">{{ row.invoiceID }}</a></td>
+      <td class="date">{{ row.receiptDateAndTime }}</td>
+      <td><a class="text-link" href="{{ url_for('order_detail', order_id=row.orderID) }}">{{ row.orderTrackingNumber }}</a><small class="cell-secondary">{{ row.orderType }} · {{ row.orderPaymentMethod }}</small></td>
+      <td>{{ row.businessgroupName }}</td><td><a class="text-link" href="{{ url_for('shipment_detail', shipment_id=row.shipmentID) }}">{{ row.shipmentID }}</a></td>
+      <td>{{ row.receiptTaxFee|money }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p class="empty">No delivery receipts match your search.</p>{% endif %}
+  {{ pagination('receipts', page, pages, total, 'delivery receipt', page_args) }}
+</section>
+{% endblock %}

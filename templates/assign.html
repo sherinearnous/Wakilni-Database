@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "components.html" import fleet_fields %}
+{% block title %}Assign shipment{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('order_detail', order_id=order.orderID) }}">‹ {{ order.orderTrackingNumber }}</a>
+<header class="page-head"><div><p class="eyebrow">DISPATCH PLANNING</p><h1>Assign shipment</h1>
+  <p class="subtitle">{{ order.orderTrackingNumber }} · {{ order.businessgroupName }} · {{ options.units|number }} units</p></div></header>
+{% if error %}<div class="flash error" role="alert">{{ error }}</div>{% endif %}
+<section class="panel detail assign-card">
+  <h2><span class="icon icon-shipments" aria-hidden="true"></span> Use a planned shipment</h2>
+  {% if options.routes %}
+  <p class="form-note">These routes already stop at this order’s receiving location and have space for the full order.</p>
+  <form method="post" class="assign-inline">
+    <input type="hidden" name="token" value="{{ token }}"><input type="hidden" name="mode" value="existing">
+    <div><label for="shipment">Planned shipment</label><select name="shipment" id="shipment" required>
+      <option value="">Choose a shipment</option>
+      {% for row in options.routes %}<option value="{{ row.shipmentID }}" {% if form.get('shipment') == row.shipmentID %}selected{% endif %}>{{ row.shipmentID }} · {{ row.plannedDispatchDateAndTime }} · {{ row.shipmentMethod }}</option>{% endfor %}
+    </select></div>
+    <button class="button primary" type="submit">Assign order</button>
+  </form>
+  {% else %}<p class="form-note">No existing planned shipment has the right stop, schedule, and capacity for this order.</p>{% endif %}
+</section>
+<section class="panel detail assign-card">
+  <h2><span class="icon icon-plus" aria-hidden="true"></span> Create a planned shipment</h2>
+  {% if options.fleet and options.pickups %}
+  <p class="form-note">The site adds a pickup and a delivery stop. Both stay pending until the shipment is handled.</p>
+  <form method="post">
+    <input type="hidden" name="token" value="{{ token }}"><input type="hidden" name="mode" value="new">
+    <div class="form-grid">
+      {{ fleet_fields(options.fleet, form.get('driver', ''), form.get('vehicle', '')) }}
+      <div><label for="pickup">Pickup location</label><select name="pickup" id="pickup" required>
+        <option value="">Choose a business group location</option>
+        {% for row in options.pickups %}<option value="{{ row.businesslocationID }}" {% if form.get('pickup') == row.businesslocationID %}selected{% endif %}>{{ row.businesslocationType }} · {{ row.label }} · {{ row.addressCity }}</option>{% endfor %}
+      </select></div>
+      <div><label for="departure">Planned dispatch <small>Beirut time</small></label><input type="datetime-local" id="departure" name="departure" min="{{ options.earliest.isoformat(timespec='minutes') }}" value="{{ form.get('departure', default_time) }}" required></div>
+      <div><label for="method">Shipment method</label><select id="method" name="method" required>
+        {% for method in methods %}<option {% if form.get('method') == method %}selected{% endif %}>{{ method }}</option>{% endfor %}
+      </select></div>
+    </div>
+    <div class="form-actions compact"><a class="button secondary" href="{{ url_for('order_detail', order_id=order.orderID) }}">Cancel</a><button class="button primary" type="submit">Create and assign</button></div>
+  </form>
+  {% else %}<p class="form-note">Creating a shipment requires a suitable unused driver and vehicle and a separate pickup location for this business group.</p>{% endif %}
+</section>
+{% endblock %}
+{% block script %}
+{% if options.fleet and options.pickups %}
+<script type="application/json" id="fleet-options">{{ options.fleet|tojson }}</script>
+<script src="{{ url_for('static', filename='fleet-form.js') }}" defer></script>
+{% endif %}
+{% endblock %}

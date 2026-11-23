@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "components.html" import badge %}
+{% block title %}{{ driver.driverFirstName }} {{ driver.driverLastName }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('drivers') }}">‹ All drivers</a>
+<header class="page-head"><div><p class="eyebrow">DRIVER · {{ driver.driverID }}</p>
+  <h1>{{ [driver.driverFirstName, driver.driverMiddleName, driver.driverLastName]|select|join(' ') }}</h1></div>{{ badge(driver.employmentStatus|capitalize) }}</header>
+<section class="panel detail storage">
+  <h2><span class="icon icon-drivers" aria-hidden="true"></span> Driver licenses</h2>
+  {% if categories %}
+  <dl class="location-grid">
+    {% for category, vehicles in categories %}<div><dt>License category {{ category }}</dt><dd>{{ vehicles|join(', ') or '—' }}</dd></div>{% endfor %}
+  </dl>
+  {% if 'D' in categories|map(attribute=0)|list %}<p class="form-note">Category D is recorded in the driver’s profile. The demo fleet has no vehicle type mapped to category D.</p>{% endif %}
+  {% else %}<p class="form-note">No license categories are recorded for this driver.</p>{% endif %}
+</section>
+<div class="details-grid section-gap">
+  <section class="panel detail"><h2>Employment details</h2>
+    <dl>
+      <dt>Driver ID</dt><dd>{{ driver.driverID }}</dd>
+      <dt>First name</dt><dd>{{ driver.driverFirstName }}</dd>
+      <dt>Middle name</dt><dd>{{ driver.driverMiddleName or '—' }}</dd>
+      <dt>Last name</dt><dd>{{ driver.driverLastName }}</dd>
+      <dt>Employment status</dt><dd>{{ driver.employmentStatus|capitalize }}</dd>
+      <dt>Join date</dt><dd>{{ driver.driveJoinDate }}</dd>
+      <dt>Leave date</dt><dd>{{ driver.driverLeaveDate or '—' }}</dd>
+      <dt>Salary</dt><dd>{{ driver.driverSalary|money }}</dd>
+      <dt>Overtime hours</dt><dd>{{ driver.driverOvertimeHours if driver.driverOvertimeHours is not none else '—' }}</dd>
+      <dt>Overtime fee</dt><dd>{{ driver.overtimeFee|money if driver.overtimeFee is not none else '—' }}</dd>
+    </dl>
+  </section>
+  <section class="panel detail"><h2>Vehicle and contacts</h2>
+    <dl>
+      <dt>Assigned vehicle ID</dt><dd>{% if driver.vehicleID %}<a class="text-link" href="{{ url_for('vehicle_detail', vehicle_id=driver.vehicleID) }}">{{ driver.vehicleID }}</a>{% else %}Unassigned{% endif %}</dd>
+      <dt>Vehicle type</dt><dd>{{ driver.vehicleType or '—' }}</dd>
+      <dt>Registration</dt><dd>{{ driver.vehicleRegistrationNo or '—' }}</dd>
+      <dt>Phone numbers</dt><dd>{% for row in phones %}<span class="contact-line">{{ row.phoneNo }}</span>{% else %}—{% endfor %}</dd>
+      <dt>Email addresses</dt><dd>{% for row in emails %}<span class="contact-line">{{ row.driverEmail }}</span>{% else %}—{% endfor %}</dd>
+    </dl>
+  </section>
+</div>
+<section class="panel">
+  <div class="panel-head"><h2>Shipments</h2></div>
+  {% if routes %}<div class="table-wrap"><table>
+    <thead><tr><th>Shipment ID</th><th>Planned dispatch</th><th>Vehicle registration</th><th>Status</th></tr></thead>
+    <tbody>{% for route in routes %}<tr>
+      <td><a class="record" href="{{ url_for('shipment_detail', shipment_id=route.shipmentID) }}">{{ route.shipmentID }}</a></td>
+      <td class="date">{{ route.plannedDispatchDateAndTime }}</td><td><a class="text-link" href="{{ url_for('vehicle_detail', vehicle_id=route.vehicleID) }}">{{ route.vehicleRegistrationNo }}</a></td><td>{{ badge(route.shipmentStatus) }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p class="empty">This driver has no shipments.</p>{% endif %}
+</section>
+{% endblock %}

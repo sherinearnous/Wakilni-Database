@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "components.html" import badge, product_table %}
+{% block title %}{{ group.businessgroupName }}{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('business_groups') }}">‹ All business groups</a>
+<header class="page-head"><div><p class="eyebrow">BUSINESS GROUP · {{ group.businessgroupID }}</p><h1>{{ group.businessgroupName }}</h1></div>{{ badge(group.operationalStatusWithWakilni) }}</header>
+<div class="details-grid">
+  <section class="panel detail">
+    <h2><span class="icon icon-groups" aria-hidden="true"></span> Group profile</h2>
+    <dl><dt>Business group ID</dt><dd>{{ group.businessgroupID }}</dd>
+        <dt>Business group name</dt><dd>{{ group.businessgroupName }}</dd>
+        <dt>Website</dt><dd>{{ group.businessgroupWebsite or '—' }}</dd>
+        <dt>Payout frequency</dt><dd>{{ group.payoutFrequency }}</dd>
+        <dt>Wakilni status</dt><dd>{{ group.operationalStatusWithWakilni }}</dd>
+        <dt>Business group types</dt><dd>{{ types|map(attribute='businessgroupType')|join(', ') or '—' }}</dd>
+    </dl>
+  </section>
+  <section class="panel detail">
+    <h2>Contact details</h2>
+    <dl><dt>Phone numbers</dt><dd>{% for row in phones %}<span class="contact-line">{{ row.phoneNo }}</span>{% else %}—{% endfor %}</dd>
+        <dt>Contact emails</dt><dd>{% for row in emails %}<span class="contact-line">{{ row.contactEmails }}</span>{% else %}—{% endfor %}</dd>
+    </dl>
+  </section>
+</div>
+<section class="panel"><div class="panel-head"><h2>Products</h2></div>
+  {% if products %}{{ product_table(products, false) }}{% else %}<p class="empty">This business group has no products.</p>{% endif %}
+</section>
+{% endblock %}

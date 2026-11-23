@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}New order{% endblock %}
+{% block content %}
+<a class="back" href="{{ url_for('orders') }}">‹ All orders</a>
+<header class="page-head"><div><p class="eyebrow">ORDER MANAGEMENT</p><h1>New order</h1><p class="subtitle">Record a pending delivery for an existing business group.</p></div></header>
+{% if error %}<div class="flash error" role="alert">{{ error }}</div>{% endif %}
+<form action="{{ url_for('order_new') }}" method="post" class="panel order-form">
+  <input type="hidden" name="token" value="{{ token }}">
+  <section>
+    <h2>Business group and item</h2>
+    <div class="form-grid">
+      <div><label for="merchant">Business group</label><select id="merchant" name="merchant" required>
+        <option value="">Choose a business group</option>
+        {% for row in merchants %}<option value="{{ row.id }}" {% if form.get('merchant') == row.id %}selected{% endif %}>{{ row.label }}</option>{% endfor %}
+      </select></div>
+      <div><label for="location">Receiving location</label><select id="location" name="location" required data-selected="{{ form.get('location', '') }}"><option value="">Choose a business group first</option></select></div>
+      <div><label for="product">Product</label><select id="product" name="product" required aria-describedby="price" data-selected="{{ form.get('product', '') }}"><option value="">Choose a business group first</option></select><small id="price" aria-live="polite"></small></div>
+      <label>Quantity<input name="quantity" type="number" min="1" max="99999" step="1" required value="{{ form.get('quantity', '1') }}"></label>
+    </div>
+  </section>
+  <section>
+    <h2>Delivery and payment</h2>
+    <div class="form-grid">
+      <label>Delivery fee (USD)<input name="fee" type="number" min="0" max="999.99" step="0.01" required value="{{ form.get('fee', '5.00') }}"></label>
+      <label>Payment method<select name="payment" required>
+        {% for method in payments %}<option {% if form.get('payment') == method %}selected{% endif %}>{{ method }}</option>{% endfor %}
+      </select></label>
+      <label>Requested delivery <small>Optional · Beirut time</small><input name="requested" type="datetime-local" min="{{ demo_min }}" value="{{ form.get('requested', '') }}"></label>
+      <label>Notes <small>Optional</small><textarea name="notes" maxlength="255" rows="2" placeholder="Receiving or delivery instructions">{{ form.get('notes', '') }}</textarea></label>
+    </div>
+  </section>
+  <div class="form-actions"><a class="button secondary" href="{{ url_for('orders') }}">Cancel</a><button class="button primary" type="submit">Save order</button></div>
+  <noscript><p class="empty">Enable JavaScript to select business group locations and products.</p></noscript>
+</form>
+{% endblock %}
+{% block script %}
+<script type="application/json" id="order-options">{{ {'locations': locations, 'products': products}|tojson }}</script>
+<script src="{{ url_for('static', filename='order-form.js') }}" defer></script>
+{% endblock %}
